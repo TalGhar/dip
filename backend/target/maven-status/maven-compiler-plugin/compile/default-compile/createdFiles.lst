@@ -1,4 +1,12 @@
 com/talghar/backend/RegisterAndEnrollUser$1$1.class
 com/talghar/backend/RegisterAndEnrollUser.class
+com/talghar/backend/Config/CorsConfig.class
+com/talghar/backend/Controllers/UserRegistrationController$1$1.class
+com/talghar/backend/Controllers/AdminAuthController.class
+com/talghar/backend/SubmitTX.class
+com/talghar/backend/SubmitTXUsingIdemix.class
 com/talghar/backend/RegisterAndEnrollUser$1.class
+com/talghar/backend/Controllers/UserRegistrationController$1.class
+com/talghar/backend/Models/UserRequest.class
 com/talghar/backend/App.class
+com/talghar/backend/Controllers/UserRegistrationController.class

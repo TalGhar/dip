@@ -3,17 +3,25 @@ package com.talghar.backend;
 import java.io.File;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Properties;
 import java.util.Set;
+import org.apache.milagro.amcl.FP256BN.BIG;
+import org.bouncycastle.est.EnrollmentResponse;
+import org.hyperledger.fabric.gateway.Gateway;
 import org.hyperledger.fabric.gateway.Identities;
 
 import org.hyperledger.fabric.gateway.Identity;
 import org.hyperledger.fabric.gateway.Wallet;
 import org.hyperledger.fabric.gateway.Wallets;
 import org.hyperledger.fabric.gateway.X509Identity;
+import org.hyperledger.fabric.protos.idemix.Idemix;
 
 import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.User;
+import org.hyperledger.fabric.sdk.idemix.IdemixIssuerPublicKey;
+import org.hyperledger.fabric.sdk.idemix.IdemixPseudonym;
 import org.hyperledger.fabric.sdk.identity.IdemixEnrollment;
 
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
@@ -41,7 +49,7 @@ public class RegisterAndEnrollUser {
     @RequestMapping(value = "/registerUser")
     public static void main(String[] args) throws Exception {
 
-        String enrollmentId = "testUser11";
+        String enrollmentId = "testUser114";
         String caCertPEM = new File(System.getProperty("user.dir")).getParentFile() + "/idemix-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem";
 
         Properties props = new Properties();
@@ -116,6 +124,7 @@ public class RegisterAndEnrollUser {
         RegistrationRequest registrationRequest = new RegistrationRequest(enrollmentId);
         registrationRequest.setAffiliation("org1.department1");
         registrationRequest.setEnrollmentID(enrollmentId);
+        registrationRequest.setSecret("ASD");
         Attribute testAttr = new Attribute("Test", "GaleninAK");
         registrationRequest.addAttribute(testAttr);
 
@@ -124,17 +133,33 @@ public class RegisterAndEnrollUser {
 
         String enrollmentSecret = caClient.register(registrationRequest, admin);
 
-        Enrollment enrollment = caClient.enroll(enrollmentId, enrollmentSecret, enrollmentRequest);
+        Enrollment enrollment = caClient.enroll(enrollmentId, "ASD", enrollmentRequest);
+        System.out.println(enrollment.hashCode());
 
         IdemixEnrollment idemixEnrollment = (IdemixEnrollment) caClient.idemixEnroll(enrollment, "Org1IdemixMSP");
+
+        String sk = idemixEnrollment.getSk().toString();
+        System.out.println("SK: " + sk);
+
+        byte[] skBytes = Base64.getDecoder().decode(sk.getBytes());
+
+        System.out.println("skBytes" + Arrays.toString(skBytes));
+        BIG skFinal = BIG.fromBytes(skBytes);
+        System.out.println("skFinal" + skFinal);
+
+        IdemixIssuerPublicKey ipkFinal = idemixEnrollment.getIpk();
+
+        IdemixPseudonym idemixPseudonymFinal = new IdemixPseudonym(skFinal, ipkFinal);
+        System.out.println("IPF: " + idemixPseudonymFinal);
+
         System.out.println("\nIdemix Enrollment IPK: " + idemixEnrollment.getIpk());
         System.out.println("\nIdemix enrollment MSP: " + idemixEnrollment.getMspId());
 
         Identity user = Identities.newX509Identity("Org1MSP", enrollment);
+
         wallet.put(enrollmentId, user);
 
         System.out.println("Successfully enrolled user " + enrollmentId + " and imported it into the wallet");
-
 
     }
 

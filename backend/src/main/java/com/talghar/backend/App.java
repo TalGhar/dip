@@ -8,19 +8,24 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
+import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.util.Properties;
+import java.util.Set;
 import org.hyperledger.fabric.gateway.Identities;
 
 import org.hyperledger.fabric.gateway.Identity;
 import org.hyperledger.fabric.gateway.Wallet;
 import org.hyperledger.fabric.gateway.Wallets;
+import org.hyperledger.fabric.gateway.X509Identity;
 import org.hyperledger.fabric.sdk.Enrollment;
+import org.hyperledger.fabric.sdk.User;
 import org.hyperledger.fabric.sdk.exception.CryptoException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric.sdk.security.CryptoSuiteFactory;
 import org.hyperledger.fabric_ca.sdk.EnrollmentRequest;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
+import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.hyperledger.fabric_ca.sdk.exception.EnrollmentException;
 import org.hyperledger.fabric_ca.sdk.exception.InvalidArgumentException;
 
@@ -54,16 +59,23 @@ public class App {
 
         // Create a wallet for managing identities
         Wallet wallet = Wallets.newFileSystemWallet(Paths.get("wallet"));
-        if (wallet.get("admin") != null) {
-            System.out.println(caClient.enroll("admin", "adminpw", enrollmentRequestTLS));
+        System.out.println(wallet.list());
 
-            System.out.println("An identity for the admin user \"admin\" already exists in the wallet");
+        if (wallet.get("admin") != null) {
+            File file = new File(System.getProperty("user.dir") + "/wallet/" + "admin" + ".id");
+            System.out.println(file);
+            file.delete();
+            Enrollment enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS);
+            Identity user = (Identity) Identities.newX509Identity("Org1MSP", enrollment);
+            wallet.put("admin", user);
+
+            System.out.println("An identity for the admin user \"admin\" already exists in the wallet and successfully reenrolled");
             return;
         }
 
         // Enroll the admin user, and import the new identity into the wallet.
         Enrollment enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS);
-        
+
         Identity user = (Identity) Identities.newX509Identity("Org1MSP", enrollment);
         wallet.put("admin", user);
 
