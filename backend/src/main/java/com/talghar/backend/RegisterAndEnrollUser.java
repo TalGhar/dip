@@ -1,8 +1,10 @@
 package com.talghar.backend;
 
 import java.io.File;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Properties;
@@ -17,12 +19,18 @@ import org.hyperledger.fabric.gateway.Wallet;
 import org.hyperledger.fabric.gateway.Wallets;
 import org.hyperledger.fabric.gateway.X509Identity;
 import org.hyperledger.fabric.protos.idemix.Idemix;
+import org.hyperledger.fabric.protos.msp.Identities.SerializedIdentity;
 
 import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.User;
+import org.hyperledger.fabric.sdk.idemix.IdemixCredential;
+import org.hyperledger.fabric.sdk.idemix.IdemixUtils;
+
 import org.hyperledger.fabric.sdk.idemix.IdemixIssuerPublicKey;
 import org.hyperledger.fabric.sdk.idemix.IdemixPseudonym;
+import org.hyperledger.fabric.sdk.idemix.IdemixSignature;
 import org.hyperledger.fabric.sdk.identity.IdemixEnrollment;
+import org.hyperledger.fabric.sdk.identity.IdemixIdentity;
 
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric.sdk.security.CryptoSuiteFactory;
@@ -49,7 +57,7 @@ public class RegisterAndEnrollUser {
     @RequestMapping(value = "/registerUser")
     public static void main(String[] args) throws Exception {
 
-        String enrollmentId = "testUser114";
+        String enrollmentId = "testUser118";
         String caCertPEM = new File(System.getProperty("user.dir")).getParentFile() + "/idemix-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem";
 
         Properties props = new Properties();
@@ -63,10 +71,10 @@ public class RegisterAndEnrollUser {
 
         Wallet wallet = Wallets.newFileSystemWallet(Paths.get("wallet"));
 
-        if (wallet.get(enrollmentId) != null) {
-            System.out.println("The user " + enrollmentId + " already registered in wallet");
-            return;
-        }
+//        if (wallet.get(enrollmentId) != null) {
+//            System.out.println("The user " + enrollmentId + " already registered in wallet");
+//            return;
+//        }
 
         X509Identity adminIdentity = (X509Identity) wallet.get("admin");
         if (adminIdentity == null) {
@@ -121,44 +129,50 @@ public class RegisterAndEnrollUser {
 
         };
 
-        RegistrationRequest registrationRequest = new RegistrationRequest(enrollmentId);
-        registrationRequest.setAffiliation("org1.department1");
-        registrationRequest.setEnrollmentID(enrollmentId);
-        registrationRequest.setSecret("ASD");
-        Attribute testAttr = new Attribute("Test", "GaleninAK");
-        registrationRequest.addAttribute(testAttr);
+//        RegistrationRequest registrationRequest = new RegistrationRequest(enrollmentId);
+//        registrationRequest.setAffiliation("org1.department1");
+//        registrationRequest.setEnrollmentID(enrollmentId);
+//        registrationRequest.setSecret("ASD");
+//        Attribute testAttr = new Attribute("Test", "GaleninAK");
+//        registrationRequest.addAttribute(testAttr);
 
         EnrollmentRequest enrollmentRequest = new EnrollmentRequest();
         enrollmentRequest.addAttrReq("Test");
 
-        String enrollmentSecret = caClient.register(registrationRequest, admin);
+//        String enrollmentSecret = caClient.register(registrationRequest, admin);
 
         Enrollment enrollment = caClient.enroll(enrollmentId, "ASD", enrollmentRequest);
-        System.out.println(enrollment.hashCode());
-
+        
         IdemixEnrollment idemixEnrollment = (IdemixEnrollment) caClient.idemixEnroll(enrollment, "Org1IdemixMSP");
-
-        String sk = idemixEnrollment.getSk().toString();
-        System.out.println("SK: " + sk);
-
-        byte[] skBytes = Base64.getDecoder().decode(sk.getBytes());
-
-        System.out.println("skBytes" + Arrays.toString(skBytes));
-        BIG skFinal = BIG.fromBytes(skBytes);
-        System.out.println("skFinal" + skFinal);
-
-        IdemixIssuerPublicKey ipkFinal = idemixEnrollment.getIpk();
-
-        IdemixPseudonym idemixPseudonymFinal = new IdemixPseudonym(skFinal, ipkFinal);
-        System.out.println("IPF: " + idemixPseudonymFinal);
 
         System.out.println("\nIdemix Enrollment IPK: " + idemixEnrollment.getIpk());
         System.out.println("\nIdemix enrollment MSP: " + idemixEnrollment.getMspId());
 
         Identity user = Identities.newX509Identity("Org1MSP", enrollment);
-
         wallet.put(enrollmentId, user);
 
+        ///////////
+        boolean[] disclosedFlags = new boolean[]{true, true, false, false};
+        byte[] msgEmpty = {};
+        int rhIndex = 3;
+        IdemixCredential credFinal = idemixEnrollment.getCred();
+        BIG[] attributes = new BIG[4];
+        attributes[0] = BIG.fromBytes(credFinal.getAttrs()[0]);
+        attributes[1] = BIG.fromBytes(credFinal.getAttrs()[1]);
+        attributes[2] = BIG.fromBytes(credFinal.getAttrs()[2]);
+        attributes[3] = BIG.fromBytes(credFinal.getAttrs()[3]);
+        System.out.println(Arrays.toString(attributes));
+
+        IdemixPseudonym test = new IdemixPseudonym(idemixEnrollment.getSk(), idemixEnrollment.getIpk());
+        IdemixSignature is = new IdemixSignature(idemixEnrollment.getCred(), idemixEnrollment.getSk(), test, idemixEnrollment.getIpk(), disclosedFlags, msgEmpty, rhIndex, idemixEnrollment.getCri());
+        System.out.println(is.toString());
+        if (is.verify(disclosedFlags, idemixEnrollment.getIpk(), msgEmpty, attributes, rhIndex, idemixEnrollment.getRevocationPk(), (int)idemixEnrollment.getCri().getEpoch())){
+            System.out.println("BEBRA");
+        }
+        else
+        {
+            System.out.println("NOT BEBRA");
+        }
         System.out.println("Successfully enrolled user " + enrollmentId + " and imported it into the wallet");
 
     }
