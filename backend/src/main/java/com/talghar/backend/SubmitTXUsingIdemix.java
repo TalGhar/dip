@@ -9,7 +9,6 @@ import org.hyperledger.fabric.sdk.identity.IdemixEnrollment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
  *
  * @author talghar
@@ -17,9 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SubmitTXUsingIdemix {
 
+    static {
+        System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "true");
+    }
+
     @RequestMapping(value = "/enr")
     public static void main(String args[]) throws Exception {
-        IdemixEnrollment test;
+        
     }
 
 }
