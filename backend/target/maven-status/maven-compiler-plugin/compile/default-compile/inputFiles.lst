@@ -5,5 +5,6 @@
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Controllers/UserRegistrationController.java
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/RegisterAndEnrollUser.java
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Models/UserRequest.java
+/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Models/CategoryRequest.java
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Controllers/AdminAuthController.java
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Config/CorsConfig.java

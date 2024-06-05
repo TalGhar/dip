@@ -6,6 +6,7 @@ package com.talghar.backend;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import org.hyperledger.fabric.gateway.Contract;
 import org.hyperledger.fabric.gateway.Gateway;
 import org.hyperledger.fabric.gateway.Network;
@@ -37,26 +38,28 @@ public class SubmitTX {
         Path networkConfigPath = Paths.get(connectionProfile);
         System.out.println(networkConfigPath);
         Gateway.Builder builder = Gateway.createBuilder();
-
-        builder.identity(wallet, "testUser19").networkConfig(networkConfigPath).discovery(true);
+        builder.identity(wallet, "admin").networkConfig(networkConfigPath).discovery(true);
 //
         // create a gateway connection
         try (Gateway gateway = builder.connect()) {
 
             // get the network and contract
-            Network network = gateway.getNetwork("zzz");
-            System.out.println(network);
-            Contract contract = network.getContract("basic");
-            System.out.println(contract);
+            Network network = gateway.getNetwork("zzzz");
+            Contract contract = network.getContract("walletcc");
 
-            byte[] result;
-//            contract.submitTransaction("CreateAsset", "112", "yellow", "5", "Tom", "1300");
-            contract.submitTransaction("InitLedger");
-            result = contract.evaluateTransaction("GetAllAssets");
+//            contract.submitTransaction("CreateCategory", "физ", "11", "тестовая категория");();
+//            contract.submitTransaction("CreateWallet", "testing", "100", "1", "9", "aa");
+//            contract.submitTransaction("CreateWallet", "testing", "100", "1", "10", "aaa");
+//            contract.submitTransaction("CreateWallet", "testing", "100", "1", "11", "aaaa");
+//            contract.submitTransaction("CreateWallet", "testing", "100", "1", "12", "aa");
 
-            System.out.println("\n\n\n");
+            byte[] result =  contract.evaluateTransaction("GetOwnerWallets", "aa");
             System.out.println(new String(result));
-            System.out.println("\n\n\n");
+            
+            byte[] test = contract.evaluateTransaction("GetAllWallets");
+            System.out.println("//////////////////");
+            System.out.println(new String(test));
+
         }
 
     }
