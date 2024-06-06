@@ -1,8 +1,6 @@
-com/talghar/backend/Config/CorsConfig.class
 com/talghar/backend/Controllers/AdminController$1.class
-com/talghar/backend/SubmitTX.class
+com/talghar/backend/Config/CorsConfig.class
 com/talghar/backend/Controllers/AdminController$1$1.class
-com/talghar/backend/SubmitTXUsingIdemix.class
 com/talghar/backend/Controllers/AdminController.class
 com/talghar/backend/Models/UserRequest.class
 com/talghar/backend/App.class

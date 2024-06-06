@@ -10,15 +10,10 @@ package com.talghar.backend.Models;
  */
 public class CategoryRequest {
 
-    private String form;
     private String id;
     private String name;
     private String dailyLimit;
     private String monthlyLimit;
-
-    public String getForm() {
-        return form;
-    }
 
     public String getId() {
         return id;
@@ -34,6 +29,22 @@ public class CategoryRequest {
 
     public String getMonthlyLimit() {
         return monthlyLimit;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDailyLimit(String dailyLimit) {
+        this.dailyLimit = dailyLimit;
+    }
+
+    public void setMonthlyLimit(String monthlyLimit) {
+        this.monthlyLimit = monthlyLimit;
     }
 
 }

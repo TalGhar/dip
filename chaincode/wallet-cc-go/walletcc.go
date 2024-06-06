@@ -21,7 +21,6 @@ type Wallet struct {
 }
 
 type Category struct {
-	Form         string `json:"Form"`
 	ID           string `json:"ID"`
 	Name         string `json:"Name"`
 	DailyLimit   int    `json:"DailyLimit"`
@@ -64,7 +63,7 @@ func (s *SmartContract) WalletExists(ctx contractapi.TransactionContextInterface
 	return walletJSON != nil, nil
 }
 
-func (s *SmartContract) CreateCategory(ctx contractapi.TransactionContextInterface, form string, id string, name string, daily int, monthly int) error {
+func (s *SmartContract) CreateCategory(ctx contractapi.TransactionContextInterface, id string, name string, daily int, monthly int) error {
 	exists, err := s.CategoryExists(ctx, id)
 	if err != nil {
 		return err
@@ -73,7 +72,6 @@ func (s *SmartContract) CreateCategory(ctx contractapi.TransactionContextInterfa
 		return fmt.Errorf("категория кошелька %s уже существует", id)
 	}
 	category := Category{
-		Form:         form,
 		ID:           id,
 		Name:         name,
 		DailyLimit:   daily,
@@ -161,6 +159,27 @@ func (s *SmartContract) GetOwnerWallets(ctx contractapi.TransactionContextInterf
 		}
 	}
 	return wallets, nil
+}
+
+func (s *SmartContract) UpdateCategory(ctx contractapi.TransactionContextInterface, id string, name string, daily int, monthly int) error {
+	exists, err := s.CategoryExists(ctx, id)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return fmt.Errorf("категории %s не существует", id)
+	}
+	category := Category{
+		ID:           id,
+		Name:         name,
+		DailyLimit:   daily,
+		MonthlyLimit: monthly,
+	}
+	categoryJSON, err := json.Marshal(category)
+	if err != nil {
+		return err
+	}
+	return ctx.GetStub().PutState(id, categoryJSON)
 }
 
 func main() {

@@ -37,11 +37,9 @@ public class App {
     public static void main(String[] args) throws EnrollmentException, InvalidArgumentException, CertificateException, IOException, CryptoException, org.hyperledger.fabric.sdk.exception.InvalidArgumentException, ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, Exception {
 
         SpringApplication.run(App.class, args);
-        System.out.println("Application is running!");
 
         String caCertPEM = new File(System.getProperty("user.dir")).getParentFile() + "/idemix-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem";
 
-        // Create a CA client for interacting with the CA.
         Properties props = new Properties();
         props.put("pemFile", caCertPEM);
         props.put("allowAllHostNames", "true");
@@ -51,14 +49,11 @@ public class App {
         final EnrollmentRequest enrollmentRequestTLS = new EnrollmentRequest();
         enrollmentRequestTLS.addHost("localhost");
 
-        // Create a wallet for managing identities
         Wallet wallet = Wallets.newFileSystemWallet(Paths.get("wallet"));
         System.out.println(wallet.list());
 
         if (wallet.get("admin") != null) {
-            File file = new File(System.getProperty("user.dir") + "/wallet/" + "admin" + ".id");
-            System.out.println(file);
-            file.delete();
+            wallet.remove("admin");
             Enrollment enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS);
             Identity user = (Identity) Identities.newX509Identity("Org1MSP", enrollment);
             wallet.put("admin", user);
@@ -67,9 +62,7 @@ public class App {
             return;
         }
 
-        // Enroll the admin user, and import the new identity into the wallet.
         Enrollment enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS);
-
         Identity user = (Identity) Identities.newX509Identity("Org1MSP", enrollment);
         wallet.put("admin", user);
 

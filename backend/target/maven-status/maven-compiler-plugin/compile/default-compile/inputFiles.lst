@@ -1,10 +1,10 @@
-/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/SubmitTX.java
-/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/SubmitTXUsingIdemix.java
+/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Controllers/ReceiverController.java
+/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Controllers/UserController.java
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/App.java
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Controllers/AdminController.java
-/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Controllers/UserRegistrationController.java
-/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/RegisterAndEnrollUser.java
+/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Utils/GJSonUtil.java
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Models/UserRequest.java
+/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Models/ReceiverRequest.java
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Models/CategoryRequest.java
-/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Controllers/AdminAuthController.java
+/home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Models/WalletRequest.java
 /home/talghar/Projects/dip/backend/src/main/java/com/talghar/backend/Config/CorsConfig.java
